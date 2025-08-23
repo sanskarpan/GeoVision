@@ -113,17 +113,49 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isUserScrolling = useRef(false);
 
+  // 1. Add this utility function at the top of your ChatResponseBox component
+const extractROIGeometry = (roiObject: any) => {
+  if (!roiObject) return null;
+  
+  // If it's already in correct GeoJSON format
+  if (roiObject.type && roiObject.coordinates) {
+    return roiObject;
+  }
+  
+  // If it's wrapped in a feature-like object (your current case)
+  if (roiObject.geometry?.type && roiObject.geometry?.coordinates) {
+    return {
+      type: roiObject.geometry.type,
+      coordinates: roiObject.geometry.coordinates
+    };
+  }
+  
+  return null;
+};
+
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
+    // useChat({
+    //   experimental_throttle: 100,
+    //   onToolCall: (message) => {
+    //     setToolCallTitle((message.toolCall.args as any).title);
+    //   },
+    //   initialMessages: initialMessages,
+
+    //   body: {
+    //     id: chatId,
+    //     selectedRoiGeometryInChat: selectedRoiGeometryInChat,
+    //     mapLayersNames: getMapLayersNames(),
+    //   },
     useChat({
       experimental_throttle: 100,
       onToolCall: (message) => {
         setToolCallTitle((message.toolCall.args as any).title);
       },
       initialMessages: initialMessages,
-
+  
       body: {
         id: chatId,
-        selectedRoiGeometryInChat: selectedRoiGeometryInChat,
+        selectedRoiGeometryInChat: extractROIGeometry(selectedRoiGeometryInChat), // ✅ CORRECT - extracts geometry
         mapLayersNames: getMapLayersNames(),
       },
 
@@ -575,6 +607,11 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
       }
     });
   }, [initialMessages, addRoiGeometry]);
+
+  useEffect(() => {
+    console.log('🗺️ Original ROI from store:', selectedRoiGeometryInChat);
+    console.log('🗺️ Extracted geometry being sent:', extractROIGeometry(selectedRoiGeometryInChat));
+  }, [selectedRoiGeometryInChat]);
 
   const allItems = messages.flatMap((m) => {
     // Add this message to processed messages
