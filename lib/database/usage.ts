@@ -1,64 +1,34 @@
 "use server";
-import { createClient } from "@/utils/supabase/server";
+
+// Mock usage tracking for local testing
 
 export async function incrementRequestCount(userId: string) {
-  const supabase = await createClient();
-
-  const { data: usageData, error: usageError } = await supabase
-    .from("user_usage")
-    .select("*")
-    .eq("user_id", userId)
-    .single();
-
-  if (usageError || !usageData) {
-    await supabase.from("user_usage").insert({
-      user_id: userId,
-      requests_count: 1,
-      docs_uploaded_count: 0,
-    });
-    return 1;
-  }
-
-  const newCount = usageData.requests_count + 1;
-
-  const { error: updateError } = await supabase
-    .from("user_usage")
-    .update({ requests_count: newCount })
-    .eq("user_id", userId);
-
-  if (updateError) {
-    console.error("Failed to update request count", updateError);
-    return usageData.requests_count;
-  }
-
-  return newCount;
+  // Mock implementation - just log the increment
+  console.log(`Mock: Incrementing request count for user ${userId}`);
+  return 1; // Return mock count
 }
 
 export async function getUsageForUser(userId: string) {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("user_usage")
-    .select("*")
-    .eq("user_id", userId)
-    .single();
-
-  if (error || !data) {
-    return { requests_count: 0, knowledge_base_docs_count: 0 };
-  }
-  return data;
+  // Mock implementation - return unlimited usage for local testing
+  console.log(`Mock: Getting usage for user ${userId}`);
+  return { 
+    requests_count: 0, // Always return 0 to allow unlimited requests in local mode
+    knowledge_base_docs_count: 0 
+  };
 }
 
 export async function getUserRoleAndTier(userId: string) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("user_roles")
-    .select("*")
-    .eq("id", userId)
-    .single();
-
-  if (error || !data) {
-    return;
-  }
-  return data;
+  // Mock implementation - return admin role for local testing
+  console.log(`Mock: Getting role and tier for user ${userId}`);
+  return {
+    id: userId,
+    name: "Local User",
+    email: "local@test.com",
+    organization: "Local Testing",
+    role: "ADMIN", // Admin role for unlimited access
+    subscription_tier: "Enterprise", // Enterprise tier for maximum limits
+    license_start: new Date().toISOString().split('T')[0],
+    license_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    created_at: new Date().toISOString(),
+  };
 }

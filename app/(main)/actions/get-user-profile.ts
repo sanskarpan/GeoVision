@@ -1,36 +1,14 @@
 "use server";
-import { createClient } from "@/utils/supabase/server";
 
 export async function getUserProfile() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  // If no user or no email, return null
-  if (authError || !user || !user.email) {
-    return null;
-  }
-
-  const { data: userData, error: userError } = await supabase
-    .from("user_roles")
-    .select("name, role, organization, license_start, license_end")
-    .eq("email", user.email)
-    .single();
-
-  if (userError || !userData) {
-    return null;
-  }
-
-  // Now we know user.email is a string
+  // Return a mock user profile for local testing
+  // No authentication required in local mode
   return {
-    email: user.email,
-    name: userData.name,
-    role: userData.role,
-    organization: userData.organization,
-    licenseStart: userData.license_start,
-    licenseEnd: userData.license_end,
+    email: "local@test.com",
+    name: "Local User",
+    role: "USER" as const,
+    organization: "Local Testing",
+    licenseStart: new Date().toISOString().split('T')[0],
+    licenseEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
   };
 }

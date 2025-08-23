@@ -1,7 +1,7 @@
 "use server";
 import ee from "@google/earthengine";
 import { evaluate, getMapId } from "@/features/maps/utils/gee-eval-utils";
-import { createClient } from "@/utils/supabase/server";
+// Supabase removed for local testing
 
 interface RasterDataResult {
   urlFormat: string;
@@ -30,11 +30,7 @@ export async function loadRasterData(
   visParams: visParams,
   labelNames: string[]
 ): Promise<RasterDataResult> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    throw new Error("Unauthenticated!");
-  }
+  // No authentication required for local testing
 
   let image;
 

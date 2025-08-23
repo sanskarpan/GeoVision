@@ -82,7 +82,7 @@ export default function ChatHistory() {
     setIsDeleting(true);
     try {
       for (const chatId of selectedChatIds) {
-        await deleteChatById(chatId);
+        await deleteChatById({ id: chatId, userId: "local-user-id" });
       }
       // Remove from local state
       setChats((prev) =>

@@ -12,9 +12,10 @@ export const useDocumentViewer = (documentName: string) => {
     const loadDocument = async () => {
       try {
         setIsLoading(true);
-        const signedUrl = await fetchByDocumentName(documentName);
-        if (signedUrl) {
-          setPdfUrl(signedUrl);
+        const document = await fetchByDocumentName(documentName);
+        if (document) {
+          // In local mode, we don't have actual document URLs
+          setPdfUrl("mock-pdf-url");
         } else {
           setError("Document not found");
         }

@@ -62,7 +62,7 @@ const ChatHistoryRow: FC<ChatHistoryRowProps> = ({
   const confirmDeleteChat = async () => {
     setIsDeleting(true);
     try {
-      await deleteChatById(chat.chatId);
+      await deleteChatById({ id: chat.chatId, userId: "local-user-id" });
       onDeleteChat(); // Parent callback
       setToastMessage("Chat deleted successfully", "success");
     } catch (error) {

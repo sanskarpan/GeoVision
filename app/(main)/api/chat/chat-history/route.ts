@@ -1,4 +1,3 @@
-import { createClient } from "@/utils/supabase/server";
 import { getChatsByUser } from "@/lib/database/chat/queries";
 import { NextResponse } from "next/server";
 
@@ -7,15 +6,11 @@ interface Chat {
 }
 
 export async function GET() {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  const userId = data.user?.id;
-
-  if (error || !data?.user) {
-    return NextResponse.json({ error: "Unauthenticated!" }, { status: 401 });
-  }
-
-  const chats = (await getChatsByUser(userId as string)) as Chat[];
+  // No authentication required for local testing
+  // Return empty chat history for local mode
+  const userId = "local-user-id";
+  
+  const chats = (await getChatsByUser(userId)) as Chat[];
 
   return NextResponse.json(chats);
 }

@@ -4,7 +4,7 @@ import React, { useEffect, useTransition } from "react";
 import { IconUserSquareRounded } from "@tabler/icons-react";
 import { useUserStore } from "@/stores/use-user-profile-store";
 import { useButtonsStore } from "@/stores/use-buttons-store";
-import { logout } from "@/app/(auth)/login/actions";
+// Logout function removed for local testing
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader2, User } from "lucide-react";
@@ -48,7 +48,8 @@ export default function UserProfile() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     startTransition(() => {
-      logout();
+      // Logout removed for local testing
+      console.log("Logout clicked in local mode");
     });
   }
 

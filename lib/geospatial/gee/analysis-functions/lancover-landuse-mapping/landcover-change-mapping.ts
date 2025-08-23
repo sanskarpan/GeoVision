@@ -1,7 +1,7 @@
 "use server";
 import ee from "@google/earthengine";
 import { evaluate, getMapId } from "@/features/maps/utils/gee-eval-utils";
-import { createClient } from "@/utils/supabase/server";
+// Supabase removed for local testing
 
 interface LandCoverChangeResult {
   urlFormat: string;
@@ -90,11 +90,7 @@ export default async function landcoverChangeMapping(
   startDate2: string,
   endDate2: string
 ): Promise<LandCoverChangeResult> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    throw new Error("Unauthenticated!");
-  }
+  // No authentication required for local testing
 
   // 2) Filter the Dynamic World collection with a probability mask.
   const fromCollection = ee

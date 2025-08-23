@@ -4,17 +4,13 @@
 "use server";
 import { getIdentityTokenGoogle } from "@/features/maps/utils/authentication-utils/gee-auth";
 import { convertEeGeometryToGeoJSON } from "@/features/maps/utils/geometry-utils";
-import { createClient } from "@/utils/supabase/server";
+// Supabase removed for local testing
 export const sentinelLandcoverLanduseMapping = async (
   geometry: any,
   startDate: any,
   endDate: any
 ) => {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    throw new Error("Unauthenticated!");
-  }
+  // No authentication required for local testing
 
   try {
     const url = `${process.env.GEE_CLOUD_RUN_URL}/lulc_mapping`;

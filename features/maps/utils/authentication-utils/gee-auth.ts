@@ -1,20 +1,19 @@
 "use server";
 import ee from "@google/earthengine";
 import { GoogleAuth } from "google-auth-library";
-import { createClient } from "@/utils/supabase/server";
 
 export async function geeAuthenticate(): Promise<void> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    throw new Error("Unauthenticated!");
-  }
-
+  // No user authentication required for local testing - only GEE service account auth
+  
   const key = process.env.GCP_SERVICE_ACCOUNT_KEY;
+
+  if (!key) {
+    throw new Error("GCP_SERVICE_ACCOUNT_KEY environment variable is not set");
+  }
 
   return new Promise((resolve, reject) => {
     ee.data.authenticateViaPrivateKey(
-      JSON.parse(key || ""),
+      JSON.parse(key),
       () =>
         ee.initialize(
           null,

@@ -1,7 +1,7 @@
 "use server";
 import ee from "@google/earthengine";
 import { evaluate, getMapId } from "@/features/maps/utils/gee-eval-utils";
-import { createClient } from "@/utils/supabase/server";
+// Supabase removed for local testing
 
 interface LegendConfig {
   labelNames: string[];
@@ -21,11 +21,7 @@ export default async function googleDynamicWorldMapping(
   startDate: string,
   endDate: string
 ): Promise<DynamicWorldResult> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    throw new Error("Unauthenticated!");
-  }
+  // No authentication required for local testing
 
   const dynamicWorld = ee
     .ImageCollection("GOOGLE/DYNAMICWORLD/V1")

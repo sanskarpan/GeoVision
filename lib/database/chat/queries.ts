@@ -1,263 +1,104 @@
 "use server";
-import { createClient } from "@/utils/supabase/server";
-import { NextResponse } from "next/server";
+
+// Simplified mock implementations for local testing without database
 
 // Get all chats by user
 export async function getChatsByUser(userId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ message: "Unauthenticated!" }, { status: 401 });
-  }
-
-  const { data, error } = await supabase
-    .from("chats")
-    .select("*")
-    .eq("userId", userId)
-    .order("createdAt", { ascending: false });
-
-  if (error) {
-    console.error("Failed to get chats", error);
-    throw new Error("Failed to get chats");
-  }
-
-  return data;
+  // Return empty array for local testing
+  return [];
 }
 
 // Save chat by id
 export async function saveChat({ id, title }: { id: string; title: string }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ message: "Unauthenticated!" }, { status: 401 });
-  }
-
-  const userId = user.id;
-
-  const { error } = await supabase.from("chats").insert({
-    id, // Chat ID
-    userId: userId, // Associate the chat with the authenticated user's ID
-    chatTitle: title, // Chat title
-    createdAt: new Date(), // Timestamp
-  });
-
-  if (error) {
-    console.error("Failed to save chat", error);
-    throw new Error("Failed to save chat");
-  }
-
-  return NextResponse.json(
-    { message: "Chat saved successfully" },
-    { status: 200 }
-  );
+  // Mock implementation - no actual saving in local mode
+  console.log(`Mock: Saving chat ${id} with title: ${title}`);
+  return { id, title };
 }
 
 // Get chat by id
-export async function getChatById(chatId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ message: "Unauthenticated!" }, { status: 401 });
-  }
-
-  const userId = user.id;
-
-  // Fetch the chat and ensure it belongs to the authenticated user
-  const { data: chat, error: chatError } = await supabase
-    .from("chats")
-    .select("*")
-    .eq("id", chatId)
-    .eq("userId", userId);
-
-  return chat && chat.length > 0 ? chat : null;
+export async function getChatById(id: string) {
+  // Mock implementation - return null to simulate new chat
+  console.log(`Mock: Getting chat by id ${id}`);
+  return null;
 }
 
 // Save messages
-export async function saveMessages({
-  messages,
-}: {
-  messages: Array<
-    | {
-        chatId?: string;
-        id: string;
-        role: "assistant" | "tool";
-        content: any;
-        createdAt?: Date;
-      }
-    | {
-        id: string;
-        createdAt: Date;
-        chatId: string;
-        role?: "user" | undefined;
-        content?: any;
-        experimental_providerMetadata?: any;
-      }
-  >;
-}) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ message: "Unauthenticated!" }, { status: 401 });
-  }
-
-  const { error } = await supabase.from("messages").insert(messages);
-
-  if (error) {
-    console.error("Failed to save messages", error);
-    throw new Error("Failed to save messages");
-  }
-
-  return { message: "Messages saved successfully" };
+export async function saveMessages({ messages }: { messages: any[] }) {
+  // Mock implementation - no actual saving in local mode
+  console.log(`Mock: Saving ${messages.length} messages`);
+  return messages;
 }
 
 // Get messages by chat id
-export async function getMessagesByChatId(chatId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ message: "Unauthenticated!" }, { status: 401 });
-  }
-
-  const { data, error } = await supabase
-    .from("messages")
-    .select("*")
-    .eq("chatId", chatId)
-    .order("createdAt", { ascending: true });
-
-  if (error) {
-    console.error("Failed to get messages", error);
-    throw new Error("Failed to get messages");
-  }
-
-  return data;
-}
-
-export async function getDraftedReportById(draftedReportId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ message: "Unauthenticated!" }, { status: 401 });
-  }
-
-  const userId = user.id;
-
-  // Fetch the drafted report and ensure it belongs to the authenticated user
-  const { data: draftedReport, error: reportError } = await supabase
-    .from("drafted_reports")
-    .select("*")
-    .eq("id", draftedReportId) // Match by the drafted report ID
-    .eq("userId", userId) // Ensure the report belongs to the authenticated user
-    .single();
-
-  if (reportError || !draftedReport) {
-    return NextResponse.json(
-      { message: "Drafted report not found or not authorized" },
-      { status: 404 }
-    );
-  }
-
-  return NextResponse.json(draftedReport, { status: 200 });
+export async function getMessagesByChatId(id: string) {
+  // Return empty array for local testing
+  return [];
 }
 
 // Delete chat by id
-export async function deleteChatById(chatId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ message: "Unauthenticated!" }, { status: 401 });
-  }
-
-  const userId = user.id;
-
-  // First, check if the chat belongs to the user
-  const { data: chat, error: chatError } = await supabase
-    .from("chats")
-    .select("id, userId")
-    .eq("id", chatId)
-    .single();
-
-  if (chatError || !chat || chat.userId !== userId) {
-    return NextResponse.json(
-      { message: "Chat not found or not authorized" },
-      { status: 404 }
-    );
-  }
-
-  // Delete messages associated with the chat
-  const { error: messageError } = await supabase
-    .from("messages")
-    .delete()
-    .eq("chatId", chatId);
-
-  if (messageError) {
-    console.error("Failed to delete messages", messageError);
-    throw new Error("Failed to delete messages");
-  }
-
-  // Delete the chat
-  const { error: chatDeleteError } = await supabase
-    .from("chats")
-    .delete()
-    .eq("id", chatId);
-
-  if (chatDeleteError) {
-    console.error("Failed to delete chat", chatDeleteError);
-    throw new Error("Failed to delete chat");
-  }
-
-  return { message: "Chat and associated messages deleted successfully" };
+export async function deleteChatById({
+  id,
+  userId,
+}: {
+  id: string;
+  userId: string;
+}) {
+  // Mock implementation
+  console.log(`Mock: Deleting chat ${id} for user ${userId}`);
+  return { success: true };
 }
 
-// Search Google Earth Engine (GEE) datasets
+// Delete chats by user
+export async function deleteChatsByUser(userId: string) {
+  // Mock implementation
+  console.log(`Mock: Deleting all chats for user ${userId}`);
+  return { success: true };
+}
+
+// Search GEE datasets
 export async function searchGeeDatasets(query: string) {
-  const supabase = await createClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData?.user) {
-    return NextResponse.json({ message: "Unauthenticated!" }, { status: 401 });
-  }
-
-  if (!query || query.trim() === "") {
-    return [];
-  }
-
-  const { data: matches, error } = await supabase.rpc(
-    "search_gee_datasets_ft",
+  // Mock implementation - return some sample datasets
+  console.log(`Mock: Searching GEE datasets for query: ${query}`);
+  
+  // Return some mock GEE datasets based on common queries
+  const mockDatasets = [
     {
-      query,
+      id: 1,
+      dataset_id: "LANDSAT/LC08/C02/T1_L2",
+      asset_url: "https://developers.google.com/earth-engine/datasets/catalog/LANDSAT_LC08_C02_T1_L2",
+      type: "ImageCollection",
+      start_date: "2013-04-11",
+      end_date: null,
+      title: "USGS Landsat 8 Level 2, Collection 2, Tier 1",
+      rank: 1.0
+    },
+    {
+      id: 2,
+      dataset_id: "COPERNICUS/S2_SR_HARMONIZED",
+      asset_url: "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
+      type: "ImageCollection", 
+      start_date: "2017-03-28",
+      end_date: null,
+      title: "Harmonized Sentinel-2 MSI: MultiSpectral Instrument, Level-2A",
+      rank: 0.9
+    },
+    {
+      id: 3,
+      dataset_id: "GOOGLE/DYNAMICWORLD/V1",
+      asset_url: "https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_DYNAMICWORLD_V1",
+      type: "ImageCollection",
+      start_date: "2015-06-27",
+      end_date: null,
+      title: "Dynamic World V1",
+      rank: 0.8
     }
-  );
-  if (error) {
-    console.error("Error performing full text search:", error);
-    return [];
-  }
+  ];
 
-  return matches || [];
+  // Filter based on query for better matching
+  const filtered = mockDatasets.filter(dataset => 
+    dataset.title.toLowerCase().includes(query.toLowerCase()) ||
+    dataset.dataset_id.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return filtered.length > 0 ? filtered : mockDatasets.slice(0, 3);
 }

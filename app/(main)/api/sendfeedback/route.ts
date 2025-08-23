@@ -1,6 +1,5 @@
 // It's a simple email-based feedback form. The user sends a message, and it gets sent to a recipient email address.
 
-import { createClient } from "@/utils/supabase/server";
 import FormData from "form-data";
 import Mailgun from "mailgun.js";
 import { NextResponse } from "next/server";
@@ -23,14 +22,8 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: Request) {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  const user = data?.user;
-  if (error || !data.user) {
-    return new NextResponse(JSON.stringify({ error: "Unauthenticated!" }), {
-      status: 401,
-    });
-  }
+  // No authentication required for local testing
+  const user = { email: "local@test.com" }; // Mock user
 
   const contentType = req.headers.get("content-type") || "";
   if (!contentType.includes("application/json")) {
@@ -58,6 +51,14 @@ export async function POST(req: Request) {
       }),
       { status: 400 }
     );
+  }
+
+  // If Mailgun is not configured, just log the feedback
+  if (!API_KEY || !DOMAIN || !RECIPIENT_EMAIL || !SENDER_EMAIL) {
+    console.log(`Feedback from ${user.email}: ${message}`);
+    return new NextResponse(JSON.stringify({ submitted: true }), {
+      status: 200,
+    });
   }
 
   try {

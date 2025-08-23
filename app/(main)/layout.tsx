@@ -2,10 +2,7 @@ import localFont from "next/font/local";
 import "./styles.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "@blocknote/mantine/style.css";
-import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
 import { Analytics } from "@vercel/analytics/next";
-import { getUserProfile } from "./actions/get-user-profile";
 import ClientWrapper from "@/components/client-wrapper";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -31,12 +28,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-  const { data: authResults, error } = await supabase.auth.getUser();
-  if (error || !authResults?.user) {
-    redirect("/login");
-  }
-  const userProfile = await getUserProfile();
+  // No authentication required - provide minimal user profile for local testing
+  const userProfile = {
+    email: "local@test.com",
+    name: "Local User",
+    role: "USER" as const,
+    organization: "Local Testing",
+    licenseStart: new Date().toISOString().split('T')[0],
+    licenseEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <TooltipProvider>

@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
 
 export async function GET(req: NextRequest) {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    return NextResponse.json({ error: "Unauthenticated!" }, { status: 401 });
-  }
+  // No authentication required for local testing
 
   const token = req.cookies.get("arcgis_access_token")?.value;
 

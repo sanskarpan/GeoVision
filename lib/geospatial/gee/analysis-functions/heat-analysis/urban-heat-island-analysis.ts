@@ -3,7 +3,7 @@
 import ee from "@google/earthengine";
 import { extractYear } from "@/utils/general/general-utils";
 import { evaluate, getMapId } from "@/features/maps/utils/gee-eval-utils";
-import { createClient } from "@/utils/supabase/server";
+// Supabase removed for local testing
 type AggregationMethodType = "Median" | "Mean" | "Max" | "Min";
 
 // Function to apply the correct aggregation method
@@ -168,12 +168,7 @@ export const urbanHeatIslandAnalysis = async (
   endDate: any,
   aggregationMethod: AggregationMethodType
 ) => {
-  // Authenticate the user
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    throw new Error("Unauthenticated!");
-  }
+  // No authentication required for local testing
 
   const startYear = extractYear(startDate);
   const endYear = extractYear(endDate);

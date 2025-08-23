@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
 import { getUsageForUser, getUserRoleAndTier } from "@/lib/database/usage";
 import { getPermissionSet } from "@/lib/auth";
 
 export async function GET() {
-  const supabase = await createClient();
-
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData?.user) {
-    return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
-  }
-  const userId = authData.user.id;
+  // No authentication required for local testing
+  const userId = "local-user-id";
 
   const usage = await getUsageForUser(userId);
 
@@ -24,8 +18,8 @@ export async function GET() {
 
   const { role, subscription_tier } = userRoleRecord;
   const { maxRequests, maxDocs, maxArea } = await getPermissionSet(
-    role,
-    subscription_tier
+    role as "ADMIN" | "USER" | "TRIAL",
+    subscription_tier as "Essentials" | "Pro" | "Enterprise"
   );
 
   return NextResponse.json({

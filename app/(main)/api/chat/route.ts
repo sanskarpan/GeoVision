@@ -7,7 +7,6 @@ import {
   convertToCoreMessages,
 } from "ai";
 
-import { createClient } from "@/utils/supabase/server";
 import { z } from "zod";
 
 import { NextResponse } from "next/server";
@@ -55,13 +54,9 @@ export async function POST(request: Request) {
     mapLayersNames: string[];
   } = await request.json();
 
-  const supabase = await createClient();
-  const { data: authResult, error: authError } = await supabase.auth.getUser();
-  if (authError || !authResult?.user) {
-    return NextResponse.json({ error: "Unauthenticated!" }, { status: 401 });
-  }
+  // Mock user ID for local testing - no authentication required
+  const userId = "local-user-id";
 
-  const userId = authResult.user.id;
   // Fetch the user's role + subscription
   const userRoleRecord = await getUserRoleAndTier(userId);
   if (!userRoleRecord) {
@@ -73,8 +68,8 @@ export async function POST(request: Request) {
 
   const { role, subscription_tier: subscriptionTier } = userRoleRecord;
   const { maxRequests, maxArea } = await getPermissionSet(
-    role,
-    subscriptionTier
+    role as "ADMIN" | "USER" | "TRIAL",
+    subscriptionTier as "Essentials" | "Pro" | "Enterprise"
   );
   const usage = await getUsageForUser(userId);
   if (usage.requests_count >= maxRequests) {
