@@ -424,7 +424,7 @@
 
 
 import { openai } from "@ai-sdk/openai";
-import { azure } from "@ai-sdk/azure"; // You can also use Azure's hosted GPT models. More info: https://sdk.vercel.ai/providers/ai-sdk-providers
+// import { azure } from "@ai-sdk/azure"; // You can also use Azure's hosted GPT models. More info: https://sdk.vercel.ai/providers/ai-sdk-providers
 import {
   type Message,
   type CoreUserMessage,
@@ -464,7 +464,7 @@ import {
 } from "@/features/chat/utils/general-utils";
 
 // ROI Debugging Helper Functions
-function debugROI(label, roiData) {
+function debugROI(label: string, roiData: any) {
   console.log(`🗺️ ROI DEBUG [${label}]:`, {
     exists: !!roiData,
     type: roiData?.type,
@@ -476,7 +476,7 @@ function debugROI(label, roiData) {
   });
 }
 
-function calculateROIArea(roiData) {
+function calculateROIArea(roiData: any) {
   if (!roiData?.coordinates) return null;
   
   try {
@@ -485,8 +485,8 @@ function calculateROIArea(roiData) {
     if (!coords || coords.length < 3) return null;
     
     // Simple bounding box area calculation (not accurate but good for debugging)
-    const lats = coords.map(coord => coord[1]);
-    const lngs = coords.map(coord => coord[0]);
+    const lats = coords.map((coord: any) => coord[1]);
+    const lngs = coords.map((coord: any) => coord[0]);
     const latRange = Math.max(...lats) - Math.min(...lats);
     const lngRange = Math.max(...lngs) - Math.min(...lngs);
     const approximateArea = latRange * lngRange * 111 * 111; // Very rough km² estimate

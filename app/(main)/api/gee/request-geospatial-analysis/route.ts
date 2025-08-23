@@ -3,13 +3,13 @@ import { NextRequest } from "next/server";
 import { geeAuthenticate } from "@/features/maps/utils/authentication-utils/gee-auth";
 import { urbanHeatIslandAnalysis } from "@/lib/geospatial/gee/analysis-functions/heat-analysis/urban-heat-island-analysis";
 import { airPollutionAnalysis } from "@/lib/geospatial/gee/analysis-functions/pollution-analysis/air-pollution-analysis";
-import { sentinelLandcoverLanduseMapping } from "@/lib/geospatial/gee/analysis-functions/lancover-landuse-mapping/sentinel-landcover-landuse-mapping";
+// import { sentinelLandcoverLanduseMapping } from "@/lib/geospatial/gee/analysis-functions/lancover-landuse-mapping/sentinel-landcover-landuse-mapping";
 import { convertToEeGeometry } from "@/features/maps/utils/geometry-utils";
 import googleDynamicWorldMapping from "@/lib/geospatial/gee/analysis-functions/lancover-landuse-mapping/google-dynamic-world-landcover-mapping";
 import landcoverChangeMapping from "@/lib/geospatial/gee/analysis-functions/lancover-landuse-mapping/landcover-change-mapping";
 
-const validAnalysisOptionsForVulnerabilityMapBuilder: MultiAnalysisOptionsTypeForVulnerabilityMapBuilderType[] =
-  ["Air Pollutants", "Flood Risk", "Urban Heat Island (UHI)"];
+// const validAnalysisOptionsForVulnerabilityMapBuilder: MultiAnalysisOptionsTypeForVulnerabilityMapBuilderType[] =
+//   ["Air Pollutants", "Flood Risk", "Urban Heat Island (UHI)"];
 const validAnalysisOptionsForAtmosphericGasAnalysis: MultiAnalysisOptionsTypeForAirPollutantsAnalysisType[] =
   ["CO", "NO2", "CH4", "Aerosols"];
 
