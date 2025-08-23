@@ -23,6 +23,25 @@ export default async function googleDynamicWorldMapping(
 ): Promise<DynamicWorldResult> {
   // No authentication required for local testing
 
+  console.log(`🗺️ [GoogleDynamicWorld] Starting analysis:`, {
+    hasGeometry: !!geometry,
+    geometryType: geometry?.type,
+    coordinatesCount: geometry?.coordinates?.[0]?.length || 0,
+    startDate,
+    endDate
+  });
+
+  // Validate geometry input
+  if (!geometry || !geometry.coordinates || geometry.coordinates[0]?.length < 3) {
+    console.error(`❌ [GoogleDynamicWorld] Invalid geometry:`, {
+      geometry: geometry,
+      reason: !geometry ? 'No geometry provided' : 
+               !geometry.coordinates ? 'No coordinates' : 
+               'Insufficient coordinates (need at least 3)'
+    });
+    throw new Error('Invalid geometry provided for analysis');
+  }
+
   const dynamicWorld = ee
     .ImageCollection("GOOGLE/DYNAMICWORLD/V1")
     .filterBounds(geometry)
@@ -30,6 +49,8 @@ export default async function googleDynamicWorldMapping(
     .select("label")
     .mode()
     .clip(geometry);
+
+  console.log(`🔍 [GoogleDynamicWorld] Image collection created and filtered`);
 
   const labelNames: string[] = [
     "Water",
@@ -55,6 +76,8 @@ export default async function googleDynamicWorldMapping(
     "#D1DDF9", // Snow & Ice
   ];
 
+  console.log(`📊 [GoogleDynamicWorld] Starting reduceRegion operation...`);
+
   const classOccurrences = dynamicWorld
     .reduceRegion({
       reducer: ee.Reducer.frequencyHistogram(),
@@ -68,26 +91,66 @@ export default async function googleDynamicWorldMapping(
 
   let mapStats: Record<string, string> = {};
 
-  await classOccurrences.evaluate((histogram: { [key: string]: number }) => {
-    if (!histogram) {
-      mapStats = {};
-      return;
-    }
+  try {
+    console.log(`⏳ [GoogleDynamicWorld] Evaluating class occurrences...`);
+    
+    await classOccurrences.evaluate((histogram: { [key: string]: number }) => {
+      console.log(`📈 [GoogleDynamicWorld] Histogram result:`, {
+        hasHistogram: !!histogram,
+        histogramType: typeof histogram,
+        histogramKeys: histogram ? Object.keys(histogram) : [],
+        histogramValues: histogram ? Object.values(histogram) : []
+      });
 
-    const total = Object.values(histogram).reduce(
-      (sum, count) => sum + count,
-      0
-    );
+      if (!histogram) {
+        console.warn(`⚠️ [GoogleDynamicWorld] No histogram data returned - mapStats will be empty`);
+        mapStats = {};
+        return;
+      }
 
-    // Convert raw counts to percentages
-    mapStats = Object.fromEntries(
-      Object.entries(histogram).map(([key, value]) => {
-        const labelIndex = parseInt(key, 10);
-        const className = labelNames[labelIndex] ?? `Class_${key}`;
-        const percentage = ((value / total) * 100).toFixed(2);
-        return [className, percentage];
-      })
-    );
+      const total = Object.values(histogram).reduce(
+        (sum, count) => sum + count,
+        0
+      );
+
+      console.log(`🔢 [GoogleDynamicWorld] Total pixel count: ${total}`);
+
+      if (total === 0) {
+        console.warn(`⚠️ [GoogleDynamicWorld] Total pixel count is 0 - mapStats will be empty`);
+        mapStats = {};
+        return;
+      }
+
+      // Convert raw counts to percentages
+      mapStats = Object.fromEntries(
+        Object.entries(histogram).map(([key, value]) => {
+          const labelIndex = parseInt(key, 10);
+          const className = labelNames[labelIndex] ?? `Class_${key}`;
+          const percentage = ((value / total) * 100).toFixed(2);
+          return [className, percentage];
+        })
+      );
+
+      console.log(`✅ [GoogleDynamicWorld] MapStats generated successfully:`, {
+        statsCount: Object.keys(mapStats).length,
+        sampleStats: Object.entries(mapStats).slice(0, 3) // Log first 3 entries
+      });
+
+    });
+  } catch (error) {
+    console.error(`❌ [GoogleDynamicWorld] Error during histogram evaluation:`, {
+      error: error instanceof Error ? error.message : String(error),
+      errorType: error instanceof Error ? error.constructor.name : typeof error,
+      stack: error instanceof Error ? error.stack : 'No stack trace available'
+    });
+    mapStats = {};
+  }
+
+  // Log final mapStats state
+  console.log(`📊 [GoogleDynamicWorld] Final mapStats state:`, {
+    isEmpty: Object.keys(mapStats).length === 0,
+    statsCount: Object.keys(mapStats).length,
+    hasData: Object.keys(mapStats).length > 0
   });
 
   const visualization = {
@@ -96,9 +159,13 @@ export default async function googleDynamicWorldMapping(
     palette,
   };
 
+  console.log(`🖼️ [GoogleDynamicWorld] Generating map visualization...`);
+
   const { urlFormat } = (await getMapId(dynamicWorld, visualization)) as any;
   const imageGeom = dynamicWorld.geometry();
   const imageGeometryGeojson = await evaluate(imageGeom);
+
+  console.log(`✅ [GoogleDynamicWorld] Analysis completed successfully`);
 
   return {
     urlFormat,

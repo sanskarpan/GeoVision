@@ -485,6 +485,7 @@ export async function requestGeospatialAnalysis(args: any) {
 
     const data = await response.json();
     console.log('🔍 GEE API Response data keys:', Object.keys(data));
+    console.log('🔍 GEE API Response data:', data);
 
     // This is not suitable for production, but it's a good way to check if the response is correct
     if (Object.keys(data.mapStats).length === 0) {
