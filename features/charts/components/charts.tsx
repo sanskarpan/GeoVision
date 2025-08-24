@@ -4,6 +4,7 @@ import * as echarts from "echarts";
 import { chartColors } from "@/custom-configs/charts-config";
 import EChartsReact from "echarts-for-react";
 import { useTheme } from "next-themes";
+import { FlaskAPICharts } from "./flask-api-charts";
 
 const getHslVariable = (variableName: any) => {
   const value = getComputedStyle(document.documentElement)
@@ -169,6 +170,14 @@ export default function Chart({
       );
     case "histogram":
       return <HistogramChart data={data} />;
+    case "flaskAPICharts":
+      return (
+        <FlaskAPICharts
+          data={data}
+          chartTitle={chartTitle}
+          functionType={data.functionType || "Flask API Analysis"}
+        />
+      );
     default:
       return <div></div>;
   }

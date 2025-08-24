@@ -455,6 +455,9 @@ export async function requestGeospatialAnalysis(args: any) {
     aggregationMethod,
     selectedRoiGeometry,
     experimental,
+    // Add Flask API integration parameters
+    userQuery: args.userQuery || undefined,
+    cityName: args.cityName || undefined,
   };
 
   console.log('🔍 Sending payload to GEE API:', JSON.stringify(payload, null, 2));

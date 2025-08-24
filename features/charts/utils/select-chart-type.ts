@@ -67,6 +67,40 @@ const selectChartType = () => {
           queryChart: ChartTypes.StackedBarChartForLandcoverChangeMaps,
         };
 
+      // Flask API Analysis Types
+      case "Comprehensive Urban Analysis":
+      case "Urban Planning Intelligence":
+        return {
+          statsChart: "flaskAPICharts",
+          queryChart: ChartTypes.StackedBarChartStats,
+          customChart: ChartTypes.BubbleChart,
+          unit: "score",
+        };
+
+      case "Infrastructure Analysis":
+        return {
+          statsChart: "flaskAPICharts", 
+          queryChart: ChartTypes.BarChartNumerical,
+          customChart: ChartTypes.Heatmap,
+          unit: "count",
+        };
+
+      case "Demographic Analysis":
+        return {
+          statsChart: "flaskAPICharts",
+          queryChart: ChartTypes.LineChart,
+          customChart: ChartTypes.BubbleChart,
+          unit: "people/km²",
+        };
+
+      case "Real-time Urban Data":
+        return {
+          statsChart: "flaskAPICharts",
+          queryChart: ChartTypes.BarChartPercentage,
+          customChart: ChartTypes.PieChartPercentage,
+          unit: "%",
+        };
+
       default:
         return {
           statsChart: ChartTypes.LineChart,

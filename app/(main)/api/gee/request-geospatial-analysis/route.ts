@@ -7,6 +7,14 @@ import { airPollutionAnalysis } from "@/lib/geospatial/gee/analysis-functions/po
 import { convertToEeGeometry } from "@/features/maps/utils/geometry-utils";
 import googleDynamicWorldMapping from "@/lib/geospatial/gee/analysis-functions/lancover-landuse-mapping/google-dynamic-world-landcover-mapping";
 import landcoverChangeMapping from "@/lib/geospatial/gee/analysis-functions/lancover-landuse-mapping/landcover-change-mapping";
+import { 
+  integratedAnalysis,
+  validateFlaskAPIAvailability
+} from "@/lib/geospatial/flask-api/flask-integration";
+import { 
+  shouldUseFlaskAPI, 
+  createUHIMetricsFromFlaskData
+} from "@/lib/geospatial/flask-api/flask-utils";
 
 // const validAnalysisOptionsForVulnerabilityMapBuilder: MultiAnalysisOptionsTypeForVulnerabilityMapBuilderType[] =
 //   ["Air Pollutants", "Flood Risk", "Urban Heat Island (UHI)"];
@@ -35,7 +43,60 @@ export async function POST(req: NextRequest) {
     startDate2,
     endDate2,
     multiAnalysisOptions,
+    userQuery,
+    cityName,
   } = body;
+
+  console.log(`🔍 [Analysis Request] Function Type: ${functionType}`);
+  console.log(`🔍 [Analysis Request] User Query: ${userQuery || 'Not provided'}`);
+  console.log(`🔍 [Analysis Request] City Name: ${cityName || 'Not provided'}`);
+
+  // Check if Flask API should be used
+  const useFlaskAPI = shouldUseFlaskAPI(functionType, userQuery);
+  console.log(`🔍 [Analysis Request] Use Flask API: ${useFlaskAPI}`);
+
+  // If Flask API should be used, check availability and try integrated analysis
+  if (useFlaskAPI) {
+    const isFlaskAvailable = await validateFlaskAPIAvailability();
+    console.log(`🔍 [Flask API] Availability: ${isFlaskAvailable}`);
+    
+    if (isFlaskAvailable) {
+      try {
+        console.log("🌐 [Flask API] Attempting integrated analysis...");
+        
+        const flaskResult = await integratedAnalysis(
+          functionType,
+          selectedRoiGeometry,
+          startDate1,
+          endDate1,
+          startDate2,
+          endDate2,
+          cityName,
+          aggregationMethod
+        );
+
+        // Transform Flask result to match expected GEE format
+        const transformedResult = {
+          ...flaskResult,
+          // Create UHI metrics if it's a UHI analysis
+          uhiMetrics: functionType.includes("UHI") ? 
+            createUHIMetricsFromFlaskData(flaskResult) : 
+            flaskResult.uhiMetrics
+        };
+
+        console.log("✅ [Flask API] Integrated analysis completed successfully");
+        return NextResponse.json(transformedResult, { status: 200 });
+        
+      } catch (flaskError) {
+        console.error("❌ [Flask API] Integrated analysis failed:", flaskError);
+        console.log("🔄 [Flask API] Falling back to GEE analysis...");
+        // Fall through to GEE analysis
+      }
+    } else {
+      console.log("⚠️ [Flask API] Not available, falling back to GEE analysis");
+      // Fall through to GEE analysis
+    }
+  }
 
   // Validate the ROI geometry
   if (!selectedRoiGeometry) {
