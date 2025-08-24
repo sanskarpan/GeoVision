@@ -639,7 +639,7 @@ export async function POST(request: Request) {
     tools: {
       requestGeospatialAnalysis: {
         description: `Today is ${getFormattedDate()}, so you should be able to help the user with requests by up to this date. No analysis should be done for the year of 2025 as analyses are not yet ready for the new year.
-          After running an analysis: 1. Provide a clear summary of what was analyzed and why, 2. Explain the key findings and their significance. NEVER PROVIDE MAP URLs or MAP LEGENDS FROM THE ANALYSES IN THE RESPONSE. Also the maximum area the user can request analysis for is ${maxArea} sq km. per request.
+          After running an analysis: 1. Provide a clear summary of what was analyzed and why, 2. Explain the key findings and their significance and detailed recommendations in context of Urban Planning if possible. NEVER PROVIDE MAP URLs or MAP LEGENDS FROM THE ANALYSES IN THE RESPONSE. Also the maximum area the user can request analysis for is ${maxArea} sq km. per request.
           It should be noted that the land cover map (start date: 2015) and bi-temporal land cover change map (start date: 2015) are based on Sentinel-2 imagery, UHI (start date: 2015) is based on Landsat imagery. For all "CHANGE" maps, the user must provide "startDate2 and endDate2". If in doubt about an analysis (e.g., it may not exactly match the analysis we have), you have to double check with the user.`,
         parameters: z.object({
           functionType: z.string()
