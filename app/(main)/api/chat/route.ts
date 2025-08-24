@@ -645,8 +645,20 @@ export async function POST(request: Request) {
           functionType: z.string()
             .describe(`The type of analysis to execute. It can be one of the following:
             'Urban Heat Island (UHI) Analysis',
-            'Land Use/Land Cover Maps',
-            'Land Use/Land Cover Change Maps'.`),
+            'Land Use/Land Cover Maps', 
+            'Land Use/Land Cover Change Maps',
+            'Comprehensive Urban Analysis',
+            'Infrastructure Analysis',
+            'Demographic Analysis',
+            'Real-time Urban Data',
+            'Urban Planning Intelligence'.
+            
+            New Flask API Analysis Types:
+            - Use 'Comprehensive Urban Analysis' for complete urban intelligence analysis
+            - Use 'Infrastructure Analysis' for building, road, and amenity analysis
+            - Use 'Demographic Analysis' for population and economic indicators
+            - Use 'Real-time Urban Data' for current OpenStreetMap and satellite data
+            - Use 'Urban Planning Intelligence' for integrated planning insights`),
           startDate1String: z
             .string()
             .describe(
@@ -688,6 +700,18 @@ export async function POST(request: Request) {
             .optional()
             .describe(
               "Briefly describe the title of the analysis in one sentence confirming you're working on the user's request."
+            ),
+          userQuery: z
+            .string()
+            .optional()
+            .describe(
+              "The original user query to help with intent recognition for Flask API integration."
+            ),
+          cityName: z
+            .string()
+            .optional()
+            .describe(
+              "The city name for Flask API geocoding and urban analysis. Extract from user query if mentioned."
             ),
         }),
         execute: async (args) => {

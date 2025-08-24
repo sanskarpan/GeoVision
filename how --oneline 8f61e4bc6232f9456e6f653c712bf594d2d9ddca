@@ -1,0 +1,5 @@
+[33m631d8e5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge branch 'main' of https://github.com/sanskarpan/GeoVision
+[33mc584c95[m population working without roi
+[33m8f61e4b[m Refactor: Update type annotations and comment out unused imports in chat and geospatial analysis routes
+[33m0c3680f[m basic 3 tools working
+[33mfad045c[m basic uhi analysis working

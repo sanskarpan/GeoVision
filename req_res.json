@@ -1,0 +1,724 @@
+{
+  "api_title": "Urban Planning Intelligence API - Sample Requests & Responses",
+  "base_url": "http://localhost:5000",
+  "version": "1.0.0",
+  "description": "AI-powered geospatial intelligence platform for urban planning using real-time data sources",
+  
+  "endpoints": {
+    
+    "health_check": {
+      "description": "Check API health status and get basic information",
+      "method": "GET",
+      "url": "/",
+      "headers": {},
+      "request_body": null,
+      "sample_response": {
+        "status": "healthy",
+        "service": "Urban Planning Intelligence API",
+        "version": "1.0.0",
+        "timestamp": "2024-08-24T15:30:45.123Z",
+        "endpoints": {
+          "geocode": "/api/geocode",
+          "osm_data": "/api/osm-data",
+          "satellite_data": "/api/satellite-data",
+          "demographic_data": "/api/demographic-data",
+          "comprehensive_analysis": "/api/analyze"
+        }
+      }
+    },
+
+    "geocoding": {
+      "description": "Convert city name to coordinates and location information",
+      "method": "POST",
+      "url": "/api/geocode",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "city": "London"
+      },
+      "sample_response": {
+        "status": "success",
+        "name": "London, Greater London, England, United Kingdom",
+        "lat": 51.5074456,
+        "lon": -0.1277653,
+        "country": "United Kingdom",
+        "country_code": "GB",
+        "bounding_box": [
+          "51.2867601",
+          "-0.5103751", 
+          "51.6918741",
+          "0.3340155"
+        ],
+        "place_id": 264267,
+        "importance": 0.9369181529394145,
+        "address_details": {
+          "city": "London",
+          "county": "Greater London",
+          "state": "England",
+          "country": "United Kingdom",
+          "country_code": "gb",
+          "postcode": "WC2N 5DU"
+        }
+      },
+      "error_responses": {
+        "404": {
+          "status": "failed",
+          "error": "Location 'NonexistentCity' not found"
+        },
+        "400": {
+          "status": "failed", 
+          "error": "Missing required parameter 'city'"
+        }
+      }
+    },
+
+    "openstreetmap_data": {
+      "description": "Fetch real-time infrastructure data from OpenStreetMap",
+      "method": "POST",
+      "url": "/api/osm-data",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "lat": 51.5074,
+        "lon": -0.1278,
+        "bbox_size": 0.05
+      },
+      "sample_response": {
+        "status": "success",
+        "total_features": 1247,
+        "feature_counts": {
+          "highways": 89,
+          "amenities": 156,
+          "buildings": 523,
+          "landuse_areas": 34,
+          "natural_features": 12,
+          "shops": 67
+        },
+        "landuse_breakdown": {
+          "residential": 15,
+          "commercial": 8,
+          "retail": 6,
+          "industrial": 3,
+          "grass": 2
+        },
+        "amenity_breakdown": {
+          "restaurant": 23,
+          "cafe": 18,
+          "school": 12,
+          "hospital": 8,
+          "bank": 15,
+          "pharmacy": 11,
+          "post_office": 4,
+          "library": 3,
+          "museum": 7,
+          "theatre": 5
+        },
+        "highway_breakdown": {
+          "primary": 12,
+          "secondary": 18,
+          "tertiary": 25,
+          "residential": 34
+        },
+        "features": [
+          {
+            "id": 4084978,
+            "type": "way",
+            "tags": {
+              "highway": "primary",
+              "name": "Oxford Street",
+              "lanes": "4"
+            },
+            "geometry": [
+              {"lat": 51.5154, "lon": -0.1426},
+              {"lat": 51.5156, "lon": -0.1423},
+              {"lat": 51.5158, "lon": -0.1420}
+            ]
+          }
+        ],
+        "data_quality": {
+          "completeness": "high",
+          "last_updated": "2024-08-24T15:30:45.123Z",
+          "source": "OpenStreetMap via Overpass API"
+        }
+      },
+      "error_responses": {
+        "400": [
+          {
+            "description": "Invalid latitude",
+            "response": {
+              "status": "failed",
+              "error": "Invalid latitude: 100. Must be between -90 and 90"
+            }
+          },
+          {
+            "description": "Invalid longitude", 
+            "response": {
+              "status": "failed",
+              "error": "Invalid longitude: 200. Must be between -180 and 180"
+            }
+          },
+          {
+            "description": "Invalid coordinate values",
+            "response": {
+              "status": "failed",
+              "error": "Invalid coordinate values. Must be numeric."
+            }
+          },
+          {
+            "description": "Missing required parameters",
+            "response": {
+              "status": "failed",
+              "error": "Missing required parameters: ['lat', 'lon']"
+            }
+          }
+        ],
+        "500": {
+          "description": "Server error during data processing",
+          "response": {
+            "status": "failed",
+            "error": "Internal error: Failed to retrieve infrastructure data"
+          }
+        }
+      }
+    },
+
+    "satellite_data": {
+      "description": "Get Copernicus Sentinel satellite imagery information",
+      "method": "POST", 
+      "url": "/api/satellite-data",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "lat": 51.5074,
+        "lon": -0.1278,
+        "time_range": "2years",
+        "cloud_cover": 20
+      },
+      "sample_response": {
+        "status": "success",
+        "source": "Copernicus Data Space Ecosystem",
+        "total_images": 124,
+        "time_range": "2years",
+        "missions": ["Sentinel-2A", "Sentinel-2B"],
+        "date_range": {
+          "start": "2022-08-24T10:30:15.000Z",
+          "end": "2024-08-24T15:30:45.123Z"
+        },
+        "cloud_coverage": {
+          "average": 23.5,
+          "min": 2.1,
+          "max": 19.8
+        },
+        "spatial_resolution": "10-20m",
+        "temporal_resolution": "5-day revisit",
+        "available_bands": [
+          "B02 (Blue)",
+          "B03 (Green)", 
+          "B04 (Red)",
+          "B08 (NIR)",
+          "B11 (SWIR1)",
+          "B12 (SWIR2)"
+        ],
+        "derived_indices": ["NDVI", "NDBI", "NDWI", "MNDWI"],
+        "scenes": [
+          {
+            "id": "S2A_MSIL2A_20240824T103031_N0511_R108_T30UXC_20240824T143513",
+            "datetime": "2024-08-24T10:30:31.000Z",
+            "cloud_cover": 15.2,
+            "processing_level": "L2A",
+            "platform": "sentinel-2a",
+            "instrument": "MSI"
+          },
+          {
+            "id": "S2B_MSIL2A_20240819T103629_N0511_R108_T30UXC_20240819T135842", 
+            "datetime": "2024-08-19T10:36:29.000Z",
+            "cloud_cover": 8.7,
+            "processing_level": "L2A",
+            "platform": "sentinel-2b",
+            "instrument": "MSI"
+          }
+        ],
+        "data_quality": {
+          "completeness": "high",
+          "assessment": "Found 124 suitable images for analysis"
+        }
+      },
+      "alternative_response": {
+        "status": "estimated",
+        "source": "Copernicus Sentinel-2 (Metadata Estimated)",
+        "total_images": 48,
+        "time_range": "2years",
+        "missions": ["Sentinel-2A", "Sentinel-2B"],
+        "date_range": {
+          "start": "2022-08-24T15:30:45.123Z",
+          "end": "2024-08-24T15:30:45.123Z"
+        },
+        "cloud_coverage": {
+          "average": 25.0,
+          "min": 10.0,
+          "max": 35.0
+        },
+        "spatial_resolution": "10-20m",
+        "temporal_resolution": "5-day revisit",
+        "available_bands": [
+          "B02 (Blue)",
+          "B03 (Green)",
+          "B04 (Red)", 
+          "B08 (NIR)",
+          "B11 (SWIR1)",
+          "B12 (SWIR2)"
+        ],
+        "derived_indices": ["NDVI", "NDBI", "NDWI", "MNDWI"],
+        "data_quality": {
+          "completeness": "estimated",
+          "assessment": "Estimated 48 images available for 2years period"
+        },
+        "note": "Actual image availability subject to CDSE API access"
+      }
+    },
+
+    "demographic_data": {
+      "description": "Get demographic and economic indicators from World Bank",
+      "method": "POST",
+      "url": "/api/demographic-data", 
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "country_code": "GB"
+      },
+      "sample_response": {
+        "status": "success",
+        "country_code": "GB",
+        "indicators": {
+          "total_population": {
+            "value": 67508936,
+            "year": "2022",
+            "unit": "people"
+          },
+          "urban_population_percent": {
+            "value": 84.15,
+            "year": "2022",
+            "unit": "percent"
+          },
+          "population_density": {
+            "value": 280.5,
+            "year": "2022",
+            "unit": "people per sq. km"
+          },
+          "population_growth_rate": {
+            "value": 0.53,
+            "year": "2022",
+            "unit": "annual percent"
+          },
+          "gdp_per_capita": {
+            "value": 46344.3,
+            "year": "2022",
+            "unit": "current US$"
+          }
+        },
+        "trends": {
+          "total_population": [
+            {"year": "2022", "value": 67508936},
+            {"year": "2021", "value": 67026292},
+            {"year": "2020", "value": 66834405}
+          ],
+          "urban_population_percent": [
+            {"year": "2022", "value": 84.15},
+            {"year": "2021", "value": 84.09},
+            {"year": "2020", "value": 84.03}
+          ],
+          "population_density": [
+            {"year": "2022", "value": 280.5},
+            {"year": "2021", "value": 278.5},
+            {"year": "2020", "value": 277.7}
+          ]
+        },
+        "data_quality": {
+          "source": "World Bank Open Data",
+          "last_updated": "2024-08-24T15:30:45.123Z",
+          "completeness": "high"
+        }
+      }
+    },
+
+    "comprehensive_analysis": {
+      "description": "Perform complete urban planning analysis with AI insights",
+      "method": "POST",
+      "url": "/api/analyze",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "city": "London",
+        "time_range": "2years",
+        "cloud_cover": 25,
+        "bbox_size": 0.05
+      },
+      "sample_response": {
+        "status": "success",
+        "timestamp": "2024-08-24T15:30:45.123Z",
+        "analysis_parameters": {
+          "city": "London",
+          "time_range": "2years", 
+          "cloud_cover_threshold": 25,
+          "bbox_size": 0.05
+        },
+        "location": {
+          "status": "success",
+          "name": "London, Greater London, England, United Kingdom",
+          "lat": 51.5074456,
+          "lon": -0.1277653,
+          "country": "United Kingdom",
+          "country_code": "GB",
+          "address_details": {
+            "city": "London",
+            "county": "Greater London",
+            "state": "England",
+            "country": "United Kingdom"
+          }
+        },
+        "data_sources": {
+          "openstreetmap": {
+            "status": "success",
+            "total_features": 1247,
+            "feature_counts": {
+              "highways": 89,
+              "amenities": 156,
+              "buildings": 523,
+              "landuse_areas": 34,
+              "natural_features": 12,
+              "shops": 67
+            },
+            "data_quality": {
+              "completeness": "high"
+            }
+          },
+          "satellite_data": {
+            "status": "success",
+            "source": "Copernicus Data Space Ecosystem",
+            "total_images": 124,
+            "time_range": "2years",
+            "cloud_coverage": {
+              "average": 23.5
+            },
+            "data_quality": {
+              "completeness": "high"
+            }
+          },
+          "demographic_data": {
+            "status": "success",
+            "country_code": "GB",
+            "indicators": {
+              "population_density": {
+                "value": 280.5,
+                "unit": "people per sq. km"
+              },
+              "urban_population_percent": {
+                "value": 84.15,
+                "unit": "percent"
+              }
+            },
+            "data_quality": {
+              "completeness": "high"
+            }
+          }
+        },
+        "urban_metrics": {
+          "infrastructure": {
+            "building_density": 523,
+            "road_network_density": 89,
+            "amenity_accessibility": 156,
+            "infrastructure_diversity": 10,
+            "transport_connectivity": 4,
+            "total_mapped_features": 1247
+          },
+          "development": {
+            "satellite_coverage": 124,
+            "monitoring_period": "2years",
+            "data_quality": 23.5,
+            "temporal_resolution": "5-day revisit",
+            "spatial_resolution": "10-20m",
+            "analysis_capability": 4,
+            "population_density": 280.5,
+            "urbanization_rate": 84.15,
+            "population_growth": 0.53,
+            "economic_indicator": 46344.3
+          },
+          "environment": {
+            "green_space_ratio": 8.82,
+            "natural_features_count": 12,
+            "land_use_diversity": 5,
+            "dominant_land_use": "residential"
+          },
+          "data_availability": {
+            "osm_data": true,
+            "satellite_data": true,
+            "demographic_data": true,
+            "data_completeness": "excellent"
+          },
+          "quality_scores": {
+            "infrastructure_score": 67.8,
+            "satellite_quality_score": 85.2,
+            "environmental_score": 86.5,
+            "overall_score": 79.8
+          }
+        },
+        "insights": [
+          {
+            "title": "Infrastructure Density Assessment",
+            "category": "infrastructure",
+            "content": "Analysis of London, Greater London, England, United Kingdom reveals 523 mapped buildings with 156 amenities and 89 road segments. Infrastructure density score: 67.8/100.",
+            "confidence": 0.9,
+            "data_sources": ["OpenStreetMap", "Overpass API"],
+            "recommendation": "Infrastructure density is adequate for current development patterns. Monitor for capacity constraints during peak growth periods.",
+            "priority": "medium"
+          },
+          {
+            "title": "Satellite Monitoring Capability", 
+            "category": "monitoring",
+            "content": "Found 124 Sentinel-2 images with 23.5% average cloud cover. Satellite data quality score: 85.2/100. Temporal analysis capability confirmed.",
+            "confidence": 0.85,
+            "data_sources": ["Copernicus Sentinel-2", "CDSE STAC API"],
+            "recommendation": "Excellent satellite monitoring capability. Implement regular change detection analysis for urban development tracking.",
+            "priority": "high"
+          },
+          {
+            "title": "Environmental and Land Use Analysis",
+            "category": "environment",
+            "content": "Green space ratio: 8.8% with 12 natural features mapped. Land use diversity index: 5 different categories identified.",
+            "confidence": 0.8,
+            "data_sources": ["OpenStreetMap Land Use", "Natural Feature Mapping"],
+            "recommendation": "Critical green space deficiency. Emergency conservation measures and mandatory green building standards recommended.",
+            "priority": "high"
+          },
+          {
+            "title": "Demographic and Development Context",
+            "category": "demographics", 
+            "content": "Population density: 281 people/km². Urbanization: 84.2%. Population growth: 0.53% annually. Development pressure assessment indicates low growth trajectory.",
+            "confidence": 0.85,
+            "data_sources": ["World Bank Open Data", "National Statistics"],
+            "recommendation": "Stable or declining growth allows focus on urban quality improvements and infrastructure optimization.",
+            "priority": "medium"
+          },
+          {
+            "title": "Data Availability and Analysis Capability",
+            "category": "data_quality",
+            "content": "Overall data completeness: excellent. Analysis capability score: 79.8/100. Multi-source integration successful with 3 primary data sources validated.",
+            "confidence": 0.95,
+            "data_sources": ["Multi-source Validation", "Data Quality Assessment"],
+            "recommendation": "Outstanding data availability enables comprehensive analysis. Implement continuous monitoring and automated reporting systems.",
+            "priority": "medium"
+          }
+        ],
+        "summary": {
+          "total_insights": 5,
+          "high_priority_issues": 2,
+          "data_completeness": "excellent",
+          "overall_score": 79.8,
+          "analysis_confidence": 0.87
+        },
+        "recommendations": {
+          "immediate_actions": [
+            "Excellent satellite monitoring capability. Implement regular change detection analysis for urban development tracking.",
+            "Critical green space deficiency. Emergency conservation measures and mandatory green building standards recommended."
+          ],
+          "medium_term_planning": [
+            "Infrastructure density is adequate for current development patterns. Monitor for capacity constraints during peak growth periods.",
+            "Stable or declining growth allows focus on urban quality improvements and infrastructure optimization.",
+            "Outstanding data availability enables comprehensive analysis. Implement continuous monitoring and automated reporting systems."
+          ],
+          "long_term_monitoring": []
+        }
+      }
+    }
+  },
+
+  "common_parameters": {
+    "time_range_options": [
+      "1year",
+      "2years", 
+      "5years",
+      "10years"
+    ],
+    "cloud_cover_range": {
+      "min": 0,
+      "max": 100,
+      "default": 30,
+      "description": "Maximum cloud cover percentage for satellite imagery"
+    },
+    "bbox_size_range": {
+      "min": 0.001,
+      "max": 1.0,
+      "default": 0.05,
+      "description": "Bounding box size in decimal degrees around the target location"
+    },
+    "coordinate_ranges": {
+      "latitude": {
+        "min": -90,
+        "max": 90,
+        "description": "Valid latitude range in decimal degrees"
+      },
+      "longitude": {
+        "min": -180,
+        "max": 180,
+        "description": "Valid longitude range in decimal degrees"
+      }
+    }
+  },
+
+  "http_status_codes": {
+    "200": "Success - Request completed successfully",
+    "400": "Bad Request - Invalid parameters or missing required fields",
+    "404": "Not Found - Resource not found (e.g., city not found)",
+    "500": "Internal Server Error - Server error or external API failure"
+  },
+
+  "data_sources": {
+    "primary_sources": [
+      {
+        "name": "OpenStreetMap",
+        "description": "Real-time crowdsourced geographic data",
+        "api": "Overpass API",
+        "update_frequency": "Real-time",
+        "coverage": "Global"
+      },
+      {
+        "name": "Copernicus Data Space Ecosystem",
+        "description": "European Space Agency satellite imagery",
+        "missions": ["Sentinel-1", "Sentinel-2", "Sentinel-3"],
+        "api": "STAC API",
+        "update_frequency": "5-day revisit",
+        "spatial_resolution": "10-20m"
+      },
+      {
+        "name": "World Bank Open Data",
+        "description": "Global demographic and economic indicators",
+        "api": "REST API",
+        "update_frequency": "Annual",
+        "coverage": "195 countries"
+      }
+    ],
+    "secondary_sources": [
+      {
+        "name": "NASA Earthdata",
+        "description": "Additional satellite missions and data",
+        "missions": ["Landsat-8", "Landsat-9"],
+        "coverage": "Global"
+      },
+      {
+        "name": "Nominatim",
+        "description": "Geocoding service based on OpenStreetMap", 
+        "coverage": "Global"
+      }
+    ]
+  },
+
+  "rate_limiting": {
+    "default_delay": "1.0 seconds between requests",
+    "max_retries": 3,
+    "timeout": "60 seconds per request",
+    "recommendation": "Space requests at least 1 second apart to respect API rate limits"
+  },
+
+  "integration_examples": {
+    "javascript_fetch": {
+      "description": "Example using JavaScript Fetch API",
+      "code": `
+// Health check
+fetch('http://localhost:5000/')
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+// Comprehensive analysis
+fetch('http://localhost:5000/api/analyze', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    city: 'London',
+    time_range: '2years',
+    cloud_cover: 25
+  })
+})
+.then(response => response.json())
+.then(data => {
+  console.log('Analysis complete:', data);
+  console.log('Overall Score:', data.summary.overall_score);
+  console.log('High Priority Issues:', data.summary.high_priority_issues);
+});`
+    },
+    
+    "curl_examples": {
+      "description": "Command line examples using cURL",
+      "geocoding": `curl -X POST http://localhost:5000/api/geocode \\
+  -H "Content-Type: application/json" \\
+  -d '{"city": "London"}'`,
+      
+              "osm_data": `curl -X POST http://localhost:5000/api/osm-data \\
+  -H "Content-Type: application/json" \\
+  -d '{"lat": 51.5074, "lon": -0.1278}'`,
+        
+        "satellite_data": `curl -X POST http://localhost:5000/api/satellite-data \\
+  -H "Content-Type: application/json" \\  
+  -d '{"lat": 51.5074, "lon": -0.1278, "time_range": "2years", "cloud_cover": 20}'`,
+      
+      "comprehensive_analysis": `curl -X POST http://localhost:5000/api/analyze \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "city": "London",
+    "time_range": "2years",
+    "cloud_cover": 25,
+    "bbox_size": 0.05
+  }'`
+    },
+
+    "python_requests": {
+      "description": "Example using Python requests library",
+      "code": `
+import requests
+import json
+
+# Base URL
+base_url = "http://localhost:5000"
+
+# Comprehensive analysis
+response = requests.post(
+    f"{base_url}/api/analyze",
+    headers={'Content-Type': 'application/json'},
+    json={
+        'city': 'London',
+        'time_range': '2years',
+        'cloud_cover': 25
+    }
+)
+
+if response.status_code == 200:
+    data = response.json()
+    print(f"Analysis Status: {data['status']}")
+    print(f"Overall Score: {data['summary']['overall_score']}")
+    
+    # Print insights
+    for insight in data['insights']:
+        print(f"- {insight['title']} (Priority: {insight['priority']})")
+else:
+    print(f"Error: {response.status_code} - {response.text}")
+`
+    }
+  },
+
+  "frontend_integration_notes": {
+    "loading_states": "All analysis endpoints may take 10-60 seconds. Implement proper loading indicators.",
+    "error_handling": "Always check the 'status' field in responses. Handle 'failed' status appropriately. API now returns proper 400 status codes for validation errors.",
+    "coordinate_validation": "Frontend should validate coordinates before sending: lat (-90 to 90), lon (-180 to 180). API will return detailed error messages for invalid ranges.",
+    "data_visualization": "The 'urban_metrics' object contains numerical data suitable for charts and graphs.",
+    "real_time_updates": "OSM and satellite data are real-time. Cache responses appropriately.",
+    "responsive_design": "API responses include detailed nested data - design UI to handle varying data availability.",
+    "user_experience": "Consider showing progressive results (e.g., show geocoding results immediately, then fetch other data)",
+    "improved_error_messages": "API now provides specific validation error messages that can be displayed directly to users"
+  }
+}
