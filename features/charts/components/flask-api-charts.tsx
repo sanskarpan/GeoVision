@@ -395,7 +395,7 @@ export const FlaskAPICharts: React.FC<FlaskAPIChartsProps> = ({
       {showInsights && (
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
           <FlaskInsightsChart
-            insights={data.insights}
+            insights={data.insights ?? []} // <-- Fix: always pass an array
             chartTitle={`${chartTitle} - Insights Analysis`}
             theme={theme}
           />
