@@ -92,9 +92,10 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
   const isArtifactsSidebarOpen = useButtonsStore(
     (state) => state.isArtifactsSidebarOpen
   );
-  const isSidebarCollapsed = useButtonsStore(
-    (state) => state.isSidebarCollapsed
-  );
+  // Sidebar removed - no longer needed
+  // const isSidebarCollapsed = useButtonsStore(
+  //   (state) => state.isSidebarCollapsed
+  // );
 
   const toggleArtifactsSidebar = useButtonsStore(
     (state) => state.toggleArtifactsSidebar
@@ -641,9 +642,7 @@ const extractROIGeometry = (roiObject: any) => {
 
   return (
     <div
-      className={`flex-grow transition-all duration-300 ${
-        isSidebarCollapsed ? "ml-20" : "ml-64"
-      }`}
+      className="flex-grow transition-all duration-300"
     >
       <div
         ref={scrollContainerRef}

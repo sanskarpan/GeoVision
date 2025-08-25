@@ -5,7 +5,7 @@ import React from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "react-hot-toast";
 import ToastMessage from "@/features/ui/toast-message";
-import MainSidebar from "@/components/main-sidebar/main-sidebar";
+// import MainSidebar from "@/components/main-sidebar/main-sidebar";
 import ClientHydrator from "@/components/client-hydrator";
 import ChangelogModal from "@/components/changelog-modal";
 
@@ -28,7 +28,7 @@ export default function ClientWrapper({
       <Toaster />
       <ToastMessage />
 
-      <MainSidebar />
+      {/* <MainSidebar /> */}
       {children}
     </ThemeProvider>
   );
